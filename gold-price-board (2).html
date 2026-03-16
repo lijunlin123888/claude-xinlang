@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>四福珠宝 · 贵金属实时报价</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Playfair+Display:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --gold:#C9922B;--gold-light:#E8B84B;--gold-bright:#FFD700;--gold-pale:#F5E6C4;
+  --panel:#100d05;--border:rgba(201,146,43,.28);--border-hi:rgba(232,184,75,.55);
+  --red:#E84040;--green:#3DC97A;--dim:rgba(245,230,196,.45);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:#090703;color:var(--gold-pale);font-family:'Rajdhani','Noto Serif SC',sans-serif;
+  min-height:100vh;
+  background-image:
+    radial-gradient(ellipse 90% 55% at 50% -5%,rgba(201,146,43,.13) 0%,transparent 68%),
+    radial-gradient(ellipse 45% 45% at 5% 85%,rgba(201,146,43,.07) 0%,transparent 55%),
+    radial-gradient(ellipse 45% 45% at 95% 15%,rgba(201,146,43,.07) 0%,transparent 55%),
+    linear-gradient(rgba(201,146,43,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(201,146,43,.035) 1px,transparent 1px);
+  background-size:100% 100%,100% 100%,100% 100%,44px 44px,44px 44px;
+}
+.page{max-width:960px;margin:0 auto;padding:20px 14px 40px;}
+
+/* HEADER */
+header{text-align:center;padding:26px 0 18px;border-bottom:1px solid var(--border);margin-bottom:20px;}
+.hd-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:4px;}
+.gem{width:9px;height:9px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
+.store{font-family:'Playfair Display','Noto Serif SC',serif;font-size:clamp(28px,6vw,46px);font-weight:900;letter-spacing:.16em;background:linear-gradient(130deg,#B87A18 0%,#FFD700 45%,#E8B84B 65%,#B87A18 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.sub{font-size:11px;letter-spacing:.45em;color:var(--dim);text-transform:uppercase;margin-top:3px;}
+.deco{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:9px;}
+.deco-line{flex:1;max-width:110px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.deco-txt{font-size:10px;letter-spacing:.35em;color:var(--gold);opacity:.65;}
+
+/* STATUS */
+.status{display:flex;align-items:center;justify-content:space-between;background:rgba(201,146,43,.06);border:1px solid var(--border);border-radius:4px;padding:9px 16px;margin-bottom:18px;flex-wrap:wrap;gap:8px;}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);position:relative;flex-shrink:0;}
+.live-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--green);animation:ring 1.6s ease-out infinite;}
+@keyframes ring{0%{transform:scale(1);opacity:.8}100%{transform:scale(2.3);opacity:0}}
+.live-lbl{display:flex;align-items:center;gap:8px;font-size:13px;}
+.live-lbl .on{color:var(--green);font-weight:700;}
+.ts{font-family:'Rajdhani',monospace;font-size:12px;color:var(--dim);}
+.rbtn{background:rgba(201,146,43,.14);border:1px solid var(--border-hi);color:var(--gold-light);padding:5px 14px;border-radius:3px;font-size:12px;letter-spacing:.12em;cursor:pointer;transition:background .2s;font-family:'Rajdhani',sans-serif;}
+.rbtn:hover{background:rgba(201,146,43,.28);}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.spinning{animation:spin .55s linear;}
+
+/* ERROR */
+.err{background:rgba(232,64,64,.09);border:1px solid rgba(232,64,64,.3);border-radius:4px;padding:10px 16px;font-size:13px;color:#E84040;margin-bottom:14px;display:none;}
+.err.show{display:block;}
+
+/* 四种贵金属大卡片 */
+.metals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-bottom:22px;}
+.metal-card{
+  background:linear-gradient(135deg,rgba(201,146,43,.09) 0%,rgba(16,13,5,.97) 60%,rgba(201,146,43,.05) 100%);
+  border:1px solid var(--border-hi);border-radius:6px;padding:18px 20px;
+  position:relative;overflow:hidden;transition:transform .15s,border-color .2s;cursor:default;
+}
+.metal-card:hover{transform:translateY(-2px);border-color:var(--gold);}
+.metal-card::before{position:absolute;right:-6px;top:-14px;font-size:72px;font-family:'Playfair Display',serif;font-weight:900;color:rgba(201,146,43,.05);pointer-events:none;line-height:1;}
+.metal-card.au::before{content:'Au';}
+.metal-card.ag::before{content:'Ag';}
+.metal-card.pt::before{content:'Pt';}
+.metal-card.pd::before{content:'Pd';}
+.mc-symbol{font-size:10px;letter-spacing:.4em;color:var(--dim);text-transform:uppercase;margin-bottom:4px;}
+.mc-name{font-family:'Noto Serif SC',serif;font-size:16px;color:var(--gold-light);font-weight:700;margin-bottom:10px;}
+.mc-price{font-family:'Rajdhani',monospace;font-size:clamp(28px,4vw,36px);font-weight:700;line-height:1;background:linear-gradient(130deg,#E8B84B,#FFD700,#C9922B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:-0.5px;}
+.mc-unit{font-size:11px;color:var(--dim);margin-top:3px;}
+.mc-chg{display:flex;gap:10px;margin-top:8px;align-items:center;}
+.mc-chg-val{font-family:'Rajdhani',monospace;font-size:14px;font-weight:700;}
+.mc-chg-pct{font-size:12px;opacity:.85;}
+.up{color:var(--green);}.down{color:var(--red);}
+@keyframes fup{0%{background:rgba(61,201,122,.15)}100%{background:transparent}}
+@keyframes fdn{0%{background:rgba(232,64,64,.15)}100%{background:transparent}}
+.fu{animation:fup .9s ease-out;}.fd{animation:fdn .9s ease-out;}
+
+/* SEC TITLE */
+.sec{font-size:10px;letter-spacing:.5em;color:var(--dim);text-transform:uppercase;margin-bottom:11px;display:flex;align-items:center;gap:10px;}
+.sec::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border),transparent);}
+
+/* RETAIL CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;margin-bottom:22px;}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:13px 15px;position:relative;overflow:hidden;transition:border-color .2s,transform .15s;}
+.card:hover{border-color:var(--border-hi);transform:translateY(-2px);}
+.card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .2s;}
+.card:hover::after{opacity:1;}
+.c-lbl{font-size:10px;letter-spacing:.28em;color:var(--dim);margin-bottom:3px;text-transform:uppercase;}
+.c-name{font-family:'Noto Serif SC',serif;font-size:13px;color:var(--gold-light);margin-bottom:8px;font-weight:600;}
+.c-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(201,146,43,.1);}
+.c-row:last-child{border-bottom:none;}
+.c-type{font-size:10px;color:var(--dim);letter-spacing:.08em;}
+.c-price{font-family:'Rajdhani',monospace;font-size:18px;font-weight:700;letter-spacing:-.3px;}
+.buy .c-price{color:var(--red);}.sell .c-price{color:var(--green);}
+.c-u{font-size:10px;color:var(--dim);margin-left:1px;}
+
+/* TICKER */
+.ticker{overflow:hidden;background:rgba(201,146,43,.055);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:7px 0;margin-bottom:22px;}
+.track{display:flex;white-space:nowrap;animation:tick 40s linear infinite;}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ti{padding:0 26px;font-size:12px;letter-spacing:.07em;color:var(--gold);display:inline-flex;align-items:center;gap:7px;}
+.sep{color:var(--dim);}
+
+/* INFO GRID */
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;margin-bottom:22px;}
+.ic{background:rgba(201,146,43,.05);border:1px solid var(--border);border-radius:4px;padding:11px 13px;text-align:center;}
+.ic-l{font-size:10px;letter-spacing:.28em;color:var(--dim);text-transform:uppercase;margin-bottom:5px;}
+.ic-v{font-family:'Rajdhani',monospace;font-size:18px;font-weight:700;color:var(--gold-light);}
+.ic-s{font-size:10px;color:var(--dim);margin-top:1px;}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding-top:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.fi{display:flex;flex-direction:column;gap:3px;}
+.fr{font-size:13px;color:var(--dim);display:flex;align-items:center;gap:7px;}
+.fr strong{color:var(--gold-pale);}
+.flogo{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;background:linear-gradient(130deg,#C9922B,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.15em;}
+.disc{width:100%;font-size:10px;color:rgba(245,230,196,.28);text-align:center;margin-top:13px;letter-spacing:.04em;line-height:1.7;}
+
+/* LOADING */
+.loader{position:fixed;inset:0;background:#090703;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;transition:opacity .5s;}
+.loader.gone{opacity:0;pointer-events:none;}
+.ld-name{font-family:'Playfair Display',serif;font-size:34px;font-weight:900;background:linear-gradient(130deg,#C9922B,#FFD700,#C9922B);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:.2em;animation:glow 1.6s ease-in-out infinite;}
+@keyframes glow{0%,100%{opacity:.7}50%{opacity:1}}
+.ld-bar{width:180px;height:2px;background:rgba(201,146,43,.18);border-radius:2px;overflow:hidden;}
+.ld-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-bright));border-radius:2px;animation:lf 1.5s ease-in-out infinite;}
+@keyframes lf{0%{width:0%;margin-left:0}50%{width:100%;margin-left:0}100%{width:0%;margin-left:100%}}
+.ld-txt{font-size:11px;letter-spacing:.3em;color:var(--dim);}
+
+@media(max-width:600px){
+  .page{padding:14px 10px 28px;}
+  .metals-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .metal-card{padding:14px 13px;}
+  .mc-price{font-size:24px;}
+  .cards{grid-template-columns:1fr 1fr;gap:8px;}
+  .card{padding:10px 10px;}.c-price{font-size:15px;}
+  footer{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<div class="loader" id="ld">
+  <div class="ld-name">四福珠宝</div>
+  <div class="ld-bar"><div class="ld-fill"></div></div>
+  <div class="ld-txt">正在加载实时行情 · · ·</div>
+</div>
+
+<div class="page">
+  <header>
+    <div class="hd-row"><div class="gem"></div><h1 class="store">四福珠宝</h1><div class="gem"></div></div>
+    <div class="sub">贵金属实时报价系统 · Precious Metals Price Board</div>
+    <div class="deco"><div class="deco-line"></div><div class="deco-txt">Real-Time Quotation</div><div class="deco-line"></div></div>
+  </header>
+
+  <div class="err" id="err"></div>
+
+  <div class="status">
+    <div class="live-lbl"><div class="live-dot"></div><span class="on">实时行情</span><span style="color:var(--dim);font-weight:400"> · 上海黄金交易所</span></div>
+    <div class="ts" id="ts">正在连接…</div>
+    <button class="rbtn" id="rbtn" onclick="load()">↻ 刷新</button>
+  </div>
+
+  <!-- 四种贵金属主卡片 -->
+  <div class="sec">贵金属现货价格（元 / 克）</div>
+  <div class="metals-grid">
+    <div class="metal-card au" id="card-au">
+      <div class="mc-symbol">XAU · Au9999</div>
+      <div class="mc-name">黄金</div>
+      <div class="mc-price" id="au-price">—</div>
+      <div class="mc-unit">元 / 克</div>
+      <div class="mc-chg"><span class="mc-chg-val up" id="au-chg">+0.00</span><span class="mc-chg-pct up" id="au-pct">+0.00%</span></div>
+    </div>
+    <div class="metal-card ag" id="card-ag">
+      <div class="mc-symbol">XAG · Ag9999</div>
+      <div class="mc-name">白银</div>
+      <div class="mc-price" id="ag-price">—</div>
+      <div class="mc-unit">元 / 克</div>
+      <div class="mc-chg"><span class="mc-chg-val up" id="ag-chg">+0.00</span><span class="mc-chg-pct up" id="ag-pct">+0.00%</span></div>
+    </div>
+    <div class="metal-card pt" id="card-pt">
+      <div class="mc-symbol">XPT · Pt9995</div>
+      <div class="mc-name">铂金</div>
+      <div class="mc-price" id="pt-price">—</div>
+      <div class="mc-unit">元 / 克</div>
+      <div class="mc-chg"><span class="mc-chg-val up" id="pt-chg">+0.00</span><span class="mc-chg-pct up" id="pt-pct">+0.00%</span></div>
+    </div>
+    <div class="metal-card pd" id="card-pd">
+      <div class="mc-symbol">XPD · Pd9995</div>
+      <div class="mc-name">钯金</div>
+      <div class="mc-price" id="pd-price">—</div>
+      <div class="mc-unit">元 / 克</div>
+      <div class="mc-chg"><span class="mc-chg-val up" id="pd-chg">+0.00</span><span class="mc-chg-pct up" id="pd-pct">+0.00%</span></div>
+    </div>
+  </div>
+
+  <!-- 零售报价 -->
+  <div class="sec">零售报价参考（元 / 克）</div>
+  <div class="cards" id="cards"></div>
+
+  <div class="ticker"><div class="track" id="track"></div></div>
+
+  <!-- 行情数据 -->
+  <div class="sec">今日黄金行情</div>
+  <div class="igrid">
+    <div class="ic"><div class="ic-l">黄金现价</div><div class="ic-v" id="iAu">—</div><div class="ic-s">元/克</div></div>
+    <div class="ic"><div class="ic-l">白银现价</div><div class="ic-v" id="iAg">—</div><div class="ic-s">元/克</div></div>
+    <div class="ic"><div class="ic-l">铂金现价</div><div class="ic-v" id="iPt">—</div><div class="ic-s">元/克</div></div>
+    <div class="ic"><div class="ic-l">钯金现价</div><div class="ic-v" id="iPd">—</div><div class="ic-s">元/克</div></div>
+    <div class="ic"><div class="ic-l">数据来源</div><div class="ic-v" style="font-size:12px">新浪财经</div><div class="ic-s">实时行情</div></div>
+    <div class="ic"><div class="ic-l">刷新间隔</div><div class="ic-v" style="font-size:16px">60 s</div><div class="ic-s">自动更新</div></div>
+  </div>
+
+  <footer>
+    <div class="fi">
+      <div class="fr"><span>🏪</span><strong>四福珠宝</strong>&nbsp;·&nbsp;石博园北门</div>
+      <div class="fr"><span>📞</span>18547859110</div>
+      <div class="fr"><span>📍</span>石博园北门四福珠宝</div>
+    </div>
+    <div class="flogo">四福珠宝</div>
+  </footer>
+  <div class="disc">
+    * 本页面价格仅供参考，实际成交价格以店内报价为准。贵金属价格随市场实时波动。<br>
+    数据来源：新浪财经 · 上海黄金交易所 · 零售价 = 现货价 + 加工费（仅供参考）
+  </div>
+</div>
+
+<script>
+// ── 零售加价配置（元/克，可自行调整）──────────────
+const PRODS = [
+  {name:'足金 999',   k:24, buy:8,  sell:35},
+  {name:'千足金 9999',k:24, buy:8,  sell:42},
+  {name:'24K 纯金',  k:24, buy:6,  sell:48},
+  {name:'18K 黄金',  k:18, buy:5,  sell:28},
+  {name:'22K 黄金',  k:22, buy:6,  sell:32},
+  {name:'投资金条',  k:24, buy:3,  sell:12},
+];
+
+let lastAu = 0;
+
+// ── 新浪财经贵金属代码 ────────────────────────────
+// Au9999=上海黄金 Ag9999=上海白银 Pt9995=铂金 Pd9995=钯金
+const SINA_URL = 'https://hq.sinajs.cn/list=Au9999,Ag9999,Pt9995,Pd9995';
+
+function doFetch(url) {
+  return new Promise((resolve, reject) => {
+    const t = setTimeout(() => reject(new Error('请求超时')), 10000);
+    fetch(url, { method: 'GET' })
+      .then(r => { clearTimeout(t); if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+      .then(resolve)
+      .catch(e => { clearTimeout(t); reject(e); });
+  });
+}
+
+// 解析新浪财经返回的字符串
+// 格式: var hq_str_Au9999="Au9999,399.50,399.50,399.20,400.10,399.00,399.50,399.55,..."
+function parseSina(text) {
+  const result = {};
+  const lines = text.split('\n');
+  lines.forEach(line => {
+    const m = line.match(/hq_str_(\w+)="([^"]+)"/);
+    if (!m) return;
+    const symbol = m[1];
+    const parts = m[2].split(',');
+    if (parts.length < 6) return;
+    // 字段: 名称,昨收,今开,当前价,最高,最低,...
+    result[symbol] = {
+      name:  parts[0],
+      close: parseFloat(parts[1]) || 0,  // 昨收
+      open:  parseFloat(parts[2]) || 0,  // 今开
+      price: parseFloat(parts[3]) || 0,  // 当前价
+      high:  parseFloat(parts[4]) || 0,  // 最高
+      low:   parseFloat(parts[5]) || 0,  // 最低
+    };
+  });
+  return result;
+}
+
+async function load() {
+  const btn = document.getElementById('rbtn');
+  btn.classList.add('spinning');
+
+  // 新浪财经有CORS限制，用免费代理转发
+  const proxies = [
+    'https://corsproxy.io/?' + encodeURIComponent(SINA_URL),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(SINA_URL),
+    'https://thingproxy.freeboard.io/fetch/' + encodeURIComponent(SINA_URL),
+  ];
+
+  let data = null;
+  for (const url of proxies) {
+    try {
+      const text = await doFetch(url);
+      data = parseSina(text);
+      if (data && data['Au9999'] && data['Au9999'].price > 0) break;
+      data = null;
+    } catch(e) { data = null; }
+  }
+
+  btn.classList.remove('spinning');
+
+  if (data && data['Au9999'] && data['Au9999'].price > 0) {
+    document.getElementById('err').classList.remove('show');
+    render(data);
+  } else {
+    // 所有代理失败，显示演示数据
+    document.getElementById('err').innerHTML = '⚠ 网络连接受限，显示演示数据。交易时间（9:00-15:30）数据更准确。';
+    document.getElementById('err').classList.add('show');
+    renderDemo();
+  }
+
+  document.getElementById('ld').classList.add('gone');
+}
+
+function renderDemo() {
+  render({
+    Au9999: {price:695.50, close:690.00, open:691.00, high:697.00, low:689.00},
+    Ag9999: {price:8.12,   close:8.05,   open:8.06,   high:8.15,  low:8.00},
+    Pt9995: {price:232.00, close:230.00, open:231.00, high:233.00, low:229.00},
+    Pd9995: {price:245.00, close:243.00, open:244.00, high:246.00, low:242.00},
+  });
+  document.getElementById('ts').textContent = '演示数据';
+}
+
+function render(data) {
+  const au = data['Au9999'] || {};
+  const ag = data['Ag9999'] || {};
+  const pt = data['Pt9995'] || {};
+  const pd = data['Pd9995'] || {};
+
+  updateMetal('au', au);
+  updateMetal('ag', ag);
+  updateMetal('pt', pt);
+  updateMetal('pd', pd);
+
+  // Info grid
+  setEl('iAu', au.price ? au.price.toFixed(2) : '—');
+  setEl('iAg', ag.price ? ag.price.toFixed(2) : '—');
+  setEl('iPt', pt.price ? pt.price.toFixed(2) : '—');
+  setEl('iPd', pd.price ? pd.price.toFixed(2) : '—');
+
+  // Timestamp
+  document.getElementById('ts').textContent = '更新：' + new Date().toLocaleTimeString('zh-CN');
+
+  // Cards & ticker based on gold price
+  if (au.price > 0) {
+    buildCards(au.price);
+    buildTicker(au, ag, pt, pd);
+  }
+}
+
+function updateMetal(id, d) {
+  if (!d || !d.price) return;
+  const ch  = d.price - (d.close || d.price);
+  const chp = d.close ? (ch / d.close * 100) : 0;
+  const up  = ch >= 0;
+
+  const priceEl = document.getElementById(id + '-price');
+  priceEl.classList.remove('fu','fd');
+  void priceEl.offsetWidth;
+  if (id === 'au' && lastAu > 0) priceEl.classList.add(d.price >= lastAu ? 'fu' : 'fd');
+  if (id === 'au') lastAu = d.price;
+  priceEl.textContent = d.price.toFixed(2);
+
+  const chEl  = document.getElementById(id + '-chg');
+  const pctEl = document.getElementById(id + '-pct');
+  chEl.textContent  = (up?'+':'') + ch.toFixed(2);
+  chEl.className    = 'mc-chg-val ' + (up?'up':'down');
+  pctEl.textContent = (up?'+':'') + chp.toFixed(2) + '%';
+  pctEl.className   = 'mc-chg-pct ' + (up?'up':'down');
+}
+
+function setEl(id, txt, cls) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.textContent = txt;
+  if (cls) e.className = cls;
+}
+
+function buildCards(auPrice) {
+  document.getElementById('cards').innerHTML = PRODS.map(p => {
+    const base = auPrice * (p.k / 24);
+    return `<div class="card">
+      <div class="c-lbl">黄金 · Gold</div>
+      <div class="c-name">${p.name}</div>
+      <div class="c-row buy"><span class="c-type">回收价</span><span><span class="c-price">${(base-p.buy).toFixed(2)}</span><span class="c-u">元/克</span></span></div>
+      <div class="c-row sell"><span class="c-type">零售价</span><span><span class="c-price">${(base+p.sell).toFixed(2)}</span><span class="c-u">元/克</span></span></div>
+    </div>`;
+  }).join('');
+}
+
+function buildTicker(au, ag, pt, pd) {
+  const fmt = (d, name) => {
+    if (!d || !d.price) return '';
+    const ch  = d.price - (d.close || d.price);
+    const up  = ch >= 0;
+    return `${name} ${d.price.toFixed(2)} ${up?'▲':'▼'} ${(up?'+':'')}${ch.toFixed(2)}`;
+  };
+  const auP = au.price || 0;
+  const items = [
+    fmt(au,'黄金 Au9999'),
+    fmt(ag,'白银 Ag9999'),
+    fmt(pt,'铂金 Pt9995'),
+    fmt(pd,'钯金 Pd9995'),
+    `足金999 ${(auP+35).toFixed(2)} 元/克`,
+    `千足金9999 ${(auP+42).toFixed(2)} 元/克`,
+    `24K纯金 ${(auP+48).toFixed(2)} 元/克`,
+    `18K黄金 ${(auP*18/24+28).toFixed(2)} 元/克`,
+    `投资金条 ${(auP+12).toFixed(2)} 元/克`,
+    `四福珠宝 · 石博园北门 · 18547859110`,
+  ].filter(Boolean);
+  const all = [...items,...items];
+  document.getElementById('track').innerHTML = all.map(t=>`<span class="ti"><span class="sep">◆</span>${t}</span>`).join('');
+}
+
+load();
+setInterval(load, 60000);
+</script>
+</body>
+</html>
